@@ -1,0 +1,86 @@
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:ital,opsz,wght@0,12..96,200..800;1,12..96,200..800&family=Outfit:wght@100..900&family=Caveat:wght@400;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Bricolage Grotesque", serif;
+  --font-hand: "Caveat", cursive;
+
+  --color-brand-bg: #FDFBF7;
+  --color-brand-text: #2D241E;
+  --color-brand-border: #E5E1DA;
+  --color-brand-orange: #D95D39;
+  --color-brand-green: #4A5D4E;
+  --color-brand-blue: #78909C;
+
+  --animate-marquee: marquee 28s linear infinite;
+
+  @keyframes marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+}
+
+@layer base {
+  body {
+    @apply bg-brand-bg text-brand-text font-sans antialiased;
+  }
+  
+  /* Global Grain Overlay */
+  body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.04;
+    z-index: 9999;
+    pointer-events: none;
+    background-image: url("https://grainy-gradients.vercel.app/noise.svg");
+  }
+}
+
+@layer utilities {
+  .highlight-orange {
+    @apply relative z-1 px-1;
+  }
+  .highlight-orange::after {
+    content: '';
+    @apply absolute bottom-[10%] left-[-2%] w-[104%] h-[35%] z-[-1] rounded-sm rotate-[-0.5deg] bg-brand-orange/30;
+  }
+
+  .highlight-green {
+    @apply relative z-1 px-1;
+  }
+  .highlight-green::after {
+    content: '';
+    @apply absolute bottom-[10%] left-[-2%] w-[104%] h-[35%] z-[-1] rounded-sm rotate-[0.5deg] bg-brand-green/30;
+  }
+
+  .highlight-blue {
+    @apply relative z-1 px-1;
+  }
+  .highlight-blue::after {
+    content: '';
+    @apply absolute bottom-[10%] left-[-2%] w-[104%] h-[35%] z-[-1] rounded-sm rotate-[-0.8deg] bg-brand-blue/30;
+  }
+
+  /* Organic Masks */
+  .mask-arch {
+    clip-path: ellipse(100% 100% at 50% 100%);
+    border-radius: 50% 50% 0 0;
+  }
+  
+  .mask-blob-1 {
+    border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+  }
+  
+  .mask-blob-2 {
+    border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+  }
+
+  .grainy-bg {
+    position: relative;
+  }
+}
