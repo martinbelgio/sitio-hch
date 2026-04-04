@@ -174,7 +174,7 @@ const HomeHero = () => (
 );
 
 const HomeMarquee = () => (
-  <div className="bg-brand-text text-brand-bg py-6 overflow-hidden border-y border-white/10 mt-20">
+  <div className="bg-brand-orange text-brand-bg py-6 overflow-hidden border-y border-brand-orange/20 mt-20">
     <div className="flex whitespace-nowrap animate-marquee">
       {[1, 2, 3, 4].map((i) => (
         <span key={i} className="font-serif italic text-2xl tracking-wider px-8">
@@ -333,9 +333,9 @@ const HomeCalculator = () => (
   <section id="calculador" className="py-40 px-6 relative overflow-hidden">
     <div className="absolute inset-0 z-0">
       <img src="/imagenes/%20-6.jpg" className="w-full h-full object-cover" alt="Mar" />
-      <div className="absolute inset-0 bg-brand-bg/80 backdrop-blur-[1px]"></div>
+      <div className="absolute inset-0 bg-brand-bg/40 backdrop-blur-[1px]"></div>
     </div>
-    
+
     <div className="max-w-7xl mx-auto relative z-10 grid md:grid-cols-[1fr_1.5fr] gap-24 items-center">
       <div>
         <span className="text-[10px] uppercase tracking-[0.4em] opacity-40 mb-10 block font-bold">04 — Tu punto de partida</span>
@@ -409,7 +409,7 @@ const ReporteHero = () => (
         className="w-full h-full object-cover"
         alt="Ventana al mar"
       />
-      <div className="absolute inset-0 bg-brand-bg/75 backdrop-blur-[1px]"></div>
+      <div className="absolute inset-0 bg-brand-bg/40 backdrop-blur-[1px]"></div>
     </div>
 
     <div className="relative z-10 pt-48 pb-24 px-6 max-w-7xl mx-auto w-full">
@@ -510,7 +510,7 @@ const ReporteFeatures = () => {
 };
 
 const ForWhom = () => (
-  <section className="py-32 px-6 bg-brand-blue/10 border-y border-brand-border">
+  <section className="py-32 px-6 bg-brand-text text-brand-bg border-y border-brand-border">
     <div className="max-w-7xl mx-auto">
       <span className="text-xs uppercase tracking-widest opacity-50 mb-6 block">Para quién</span>
       <h2 className="text-4xl md:text-5xl font-serif mb-16">Este reporte<br />es para vos si...</h2>
@@ -521,14 +521,14 @@ const ForWhom = () => (
           'Preferís procesar la información en privado, con calma, más de una vez.',
           'Buscás algo escrito, aplicado y sin jerga, no solo una descripción abstracta.'
         ].map((item, idx) => (
-          <motion.div 
+          <motion.div
             key={idx}
             initial={{ opacity: 0, scale: 0.95 }}
             whileInView={{ opacity: 1, scale: 1 }}
             transition={{ delay: idx * 0.1 }}
-            className="p-8 border border-brand-text/10 rounded-xl bg-brand-bg/50 text-lg leading-relaxed relative"
+            className="p-8 border border-white/10 rounded-xl bg-white/5 text-lg leading-relaxed relative"
           >
-            <span className="absolute top-4 left-4 text-brand-text/20">—</span>
+            <span className="absolute top-4 left-4 text-white/20">—</span>
             <p className="pl-6">{item}</p>
           </motion.div>
         ))}
@@ -538,7 +538,7 @@ const ForWhom = () => (
 );
 
 const Pricing = () => (
-  <section className="py-32 px-6 bg-brand-text text-brand-bg grainy-bg">
+  <section className="py-32 px-6 bg-brand-bg border-y border-brand-border">
     <div className="max-w-7xl mx-auto">
       <span className="text-xs uppercase tracking-widest opacity-40 mb-6 block">Inversión</span>
       <div className="grid md:grid-cols-[1fr_1.2fr] gap-20 items-center">
@@ -550,19 +550,19 @@ const Pricing = () => (
           <p className="text-xl opacity-70 leading-relaxed mb-6">El reporte es tuyo. Podés volver al portal las veces que quieras, sin vencimiento.</p>
           <p className="text-xl opacity-70 leading-relaxed mb-12">El precio varía según el lugar de residencia. Consultame por WhatsApp y coordinamos los detalles.</p>
           <div className="flex flex-wrap gap-4">
-            <a href="#" className="px-8 py-4 bg-brand-blue text-brand-text rounded-full font-medium hover:scale-105 transition-transform">Consultar desde Argentina</a>
-            <a href="#" className="px-8 py-4 border border-white/20 rounded-full font-medium hover:bg-white hover:text-brand-text transition-all">Consultar desde el Exterior</a>
+            <a href="#" className="px-8 py-4 bg-brand-blue text-brand-bg rounded-full font-medium hover:scale-105 transition-transform">Consultar desde Argentina</a>
+            <a href="#" className="px-8 py-4 border border-brand-text/20 rounded-full font-medium hover:bg-brand-text hover:text-brand-bg transition-all">Consultar desde el Exterior</a>
           </div>
         </div>
         <div className="space-y-6">
           {[
             { region: 'Argentina', sub: 'Precio en pesos ARS', color: 'bg-brand-blue' },
-            { region: 'Exterior', sub: 'Precio en USD', color: 'border border-white/20' }
+            { region: 'Exterior', sub: 'Precio en USD', color: 'border border-brand-text/20' }
           ].map(card => (
-            <div key={card.region} className={`p-10 rounded-2xl ${card.color === 'bg-brand-blue' ? 'bg-brand-blue text-brand-text' : 'border border-white/20'}`}>
+            <div key={card.region} className={`p-10 rounded-2xl ${card.color === 'bg-brand-blue' ? 'bg-brand-blue text-brand-bg' : 'border border-brand-text/20'}`}>
               <div className="text-4xl md:text-5xl font-serif italic mb-2">{card.region}</div>
               <div className="text-xs uppercase tracking-widest opacity-50 mb-8">{card.sub}</div>
-              <button className={`px-6 py-3 rounded-full text-sm font-medium ${card.color === 'bg-brand-blue' ? 'bg-brand-text text-brand-bg' : 'bg-white text-brand-text'}`}>
+              <button className={`px-6 py-3 rounded-full text-sm font-medium ${card.color === 'bg-brand-blue' ? 'bg-brand-text text-brand-bg' : 'bg-brand-text text-brand-bg'}`}>
                 Consultar precio ↗
               </button>
             </div>
@@ -712,7 +712,7 @@ const RaicesFeatures = () => {
 };
 
 const RaicesForWhom = () => (
-  <section className="py-32 px-6 bg-brand-green/10 border-y border-brand-border">
+  <section className="py-32 px-6 bg-brand-text text-brand-bg border-y border-brand-border">
     <div className="max-w-7xl mx-auto">
       <span className="text-xs uppercase tracking-widest opacity-50 mb-6 block">Para quién</span>
       <h2 className="text-4xl md:text-5xl font-serif mb-16">Esta lectura<br />es para vos si...</h2>
@@ -723,14 +723,14 @@ const RaicesForWhom = () => (
           'Preferís una conversación real a leer solo un documento.',
           'Querés conectar lo que dice el Diseño Humano con situaciones concretas de tu vida.'
         ].map((item, idx) => (
-          <motion.div 
+          <motion.div
             key={idx}
             initial={{ opacity: 0, scale: 0.95 }}
             whileInView={{ opacity: 1, scale: 1 }}
             transition={{ delay: idx * 0.1 }}
-            className="p-8 border border-brand-text/10 rounded-xl bg-brand-bg/50 text-lg leading-relaxed relative"
+            className="p-8 border border-white/10 rounded-xl bg-white/5 text-lg leading-relaxed relative"
           >
-            <span className="absolute top-4 left-4 text-brand-text/20">—</span>
+            <span className="absolute top-4 left-4 text-white/20">—</span>
             <p className="pl-6">{item}</p>
           </motion.div>
         ))}
@@ -764,7 +764,7 @@ const RaicesHowItWorks = () => (
 );
 
 const RaicesPricing = () => (
-  <section className="py-32 px-6 bg-brand-text text-brand-bg grainy-bg">
+  <section className="py-32 px-6 bg-brand-bg border-y border-brand-border">
     <div className="max-w-7xl mx-auto">
       <span className="text-xs uppercase tracking-widest opacity-40 mb-6 block">Inversión</span>
       <div className="grid md:grid-cols-[1fr_1.2fr] gap-20 items-center">
@@ -781,12 +781,12 @@ const RaicesPricing = () => (
         <div className="space-y-6">
           {[
             { region: 'Argentina', sub: 'Precio en pesos ARS', color: 'bg-brand-green' },
-            { region: 'Exterior', sub: 'Precio en USD', color: 'border border-white/20' }
+            { region: 'Exterior', sub: 'Precio en USD', color: 'border border-brand-text/20' }
           ].map(card => (
-            <div key={card.region} className={`p-10 rounded-2xl ${card.color === 'bg-brand-green' ? 'bg-brand-green text-brand-bg' : 'border border-white/20'}`}>
+            <div key={card.region} className={`p-10 rounded-2xl ${card.color === 'bg-brand-green' ? 'bg-brand-green text-brand-bg' : 'border border-brand-text/20'}`}>
               <div className="text-4xl md:text-5xl font-serif italic mb-2">{card.region}</div>
               <div className="text-xs uppercase tracking-widest opacity-50 mb-8">{card.sub}</div>
-              <button className={`px-6 py-3 rounded-full text-sm font-medium ${card.color === 'bg-brand-green' ? 'bg-brand-text text-brand-bg' : 'bg-white text-brand-text'}`}>
+              <button className={`px-6 py-3 rounded-full text-sm font-medium ${card.color === 'bg-brand-green' ? 'bg-brand-text text-brand-bg' : 'bg-brand-text text-brand-bg'}`}>
                 Consultar precio ↗
               </button>
             </div>
@@ -966,34 +966,36 @@ const AcompanamientoIncludes = () => {
 };
 
 const AcompanamientoForWhom = () => (
-  <section className="py-32 px-6 max-w-7xl mx-auto border-t border-brand-border">
-    <div className="max-w-4xl">
-      <span className="text-xs uppercase tracking-widest opacity-50 mb-6 block">Para quién</span>
-      <h2 className="text-4xl md:text-5xl font-serif mb-16">Este programa<br />es para vos si...</h2>
-      <div className="grid md:grid-cols-2 gap-6">
-        {[
-          'Ya tuviste una primera lectura o leíste sobre tu diseño, pero sentís que no terminás de integrarlo.',
-          'Querés ir más a fondo que una sola sesión de una hora.',
-          'Buscás que el Diseño Humano se convierta en una herramienta real, no solo en un mapa que mirás de vez en cuando.',
-          'Necesitás un espacio de acompañamiento continuo con alguien que conozca tu carta en profundidad.'
-        ].map((item, idx) => (
-          <motion.div 
-            key={idx}
-            initial={{ opacity: 0, x: -20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            transition={{ delay: idx * 0.1 }}
-            className="p-8 border border-brand-border rounded-xl text-lg leading-relaxed"
-          >
-            {item}
-          </motion.div>
-        ))}
+  <section className="py-32 px-6 bg-brand-text text-brand-bg border-y border-brand-border">
+    <div className="max-w-7xl mx-auto">
+      <div className="max-w-4xl">
+        <span className="text-xs uppercase tracking-widest opacity-50 mb-6 block">Para quién</span>
+        <h2 className="text-4xl md:text-5xl font-serif mb-16">Este programa<br />es para vos si...</h2>
+        <div className="grid md:grid-cols-2 gap-6">
+          {[
+            'Ya tuviste una primera lectura o leíste sobre tu diseño, pero sentís que no terminás de integrarlo.',
+            'Querés ir más a fondo que una sola sesión de una hora.',
+            'Buscás que el Diseño Humano se convierta en una herramienta real, no solo en un mapa que mirás de vez en cuando.',
+            'Necesitás un espacio de acompañamiento continuo con alguien que conozca tu carta en profundidad.'
+          ].map((item, idx) => (
+            <motion.div
+              key={idx}
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ delay: idx * 0.1 }}
+              className="p-8 border border-white/10 rounded-xl bg-white/5 text-lg leading-relaxed"
+            >
+              {item}
+            </motion.div>
+          ))}
+        </div>
       </div>
     </div>
   </section>
 );
 
 const AcompanamientoPricing = () => (
-  <section className="py-32 px-6 bg-brand-text text-brand-bg grainy-bg">
+  <section className="py-32 px-6 bg-brand-bg border-y border-brand-border">
     <div className="max-w-7xl mx-auto">
       <span className="text-xs uppercase tracking-widest opacity-40 mb-6 block">Inversión</span>
       <div className="grid md:grid-cols-[1fr_1.2fr] gap-20 items-center">
@@ -1013,12 +1015,12 @@ const AcompanamientoPricing = () => (
         <div className="space-y-6">
           {[
             { region: 'Argentina', sub: 'Precio en pesos ARS', color: 'bg-brand-orange' },
-            { region: 'Exterior', sub: 'Precio en USD', color: 'border border-white/20' }
+            { region: 'Exterior', sub: 'Precio en USD', color: 'border border-brand-text/20' }
           ].map(card => (
-            <div key={card.region} className={`p-10 rounded-2xl ${card.color === 'bg-brand-orange' ? 'bg-brand-orange text-brand-bg' : 'border border-white/20'}`}>
+            <div key={card.region} className={`p-10 rounded-2xl ${card.color === 'bg-brand-orange' ? 'bg-brand-orange text-brand-bg' : 'border border-brand-text/20'}`}>
               <div className="text-4xl md:text-5xl font-serif italic mb-2">{card.region}</div>
               <div className="text-xs uppercase tracking-widest opacity-50 mb-8">{card.sub}</div>
-              <button className={`px-6 py-3 rounded-full text-sm font-medium ${card.color === 'bg-brand-orange' ? 'bg-brand-text text-brand-bg' : 'bg-white text-brand-text'}`}>
+              <button className={`px-6 py-3 rounded-full text-sm font-medium ${card.color === 'bg-brand-orange' ? 'bg-brand-text text-brand-bg' : 'bg-brand-text text-brand-bg'}`}>
                 Consultar precio ↗
               </button>
             </div>
