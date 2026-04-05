@@ -22,6 +22,10 @@
 }
 
 @layer base {
+  *, *::before, *::after {
+    cursor: none !important;
+  }
+
   body {
     @apply bg-brand-bg text-brand-text font-sans antialiased;
   }
