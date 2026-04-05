@@ -25,16 +25,16 @@ const Navbar = () => {
   useEffect(() => setIsOpen(false), [location]);
 
   return (
-    <nav className={`fixed w-full top-0 z-50 transition-all duration-300 ${scrolled ? 'bg-brand-bg/90 backdrop-blur-md border-b border-brand-border py-4' : 'py-6'}`}>
+    <nav className={`fixed w-full top-0 z-50 transition-all duration-300 ${scrolled ? 'bg-brand-bg/90 backdrop-blur-md border-b border-brand-border py-4 text-brand-text' : 'py-6 text-white'}`}>
       <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
         <Link to="/" className="font-serif italic text-2xl font-medium tracking-tight">Martin Belgio</Link>
-        
+
         {/* Desktop Links */}
         <div className="hidden md:flex items-center gap-10 text-[13px] uppercase tracking-widest font-medium">
           <Link to="/reporte" className="hover:text-brand-orange transition-colors">Reporte</Link>
           <Link to="/raices" className="hover:text-brand-orange transition-colors">Echar Raíces</Link>
           <Link to="/acompanamiento" className="hover:text-brand-orange transition-colors">Acompañamiento</Link>
-          <Link to="/#calculador" className="px-6 py-2.5 border border-brand-text/20 rounded-full hover:bg-brand-text hover:text-brand-bg transition-all">Calculá tu carta</Link>
+          <Link to="/#calculador" className={`px-6 py-2.5 border rounded-full transition-all ${scrolled ? 'border-brand-text/20 hover:bg-brand-text hover:text-brand-bg' : 'border-white/40 hover:bg-white hover:text-brand-text'}`}>Calculá tu carta</Link>
         </div>
 
         {/* Mobile Toggle */}
