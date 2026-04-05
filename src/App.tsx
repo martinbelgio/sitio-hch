@@ -110,15 +110,15 @@ const Quote = () => (
 // --- Home Page Components ---
 
 const HomeHero = () => (
-  <header className="relative min-h-screen flex items-center pt-32 pb-20 overflow-hidden bg-brand-green">
+  <header className="relative min-h-screen flex items-center pb-20 overflow-hidden" style={{backgroundColor: '#2a3d2a'}}>
     {/* Background Image */}
-    <div className="absolute inset-0 z-0 overflow-hidden">
+    <div className="absolute inset-0 z-0">
       <img
         src="/VerdeHero.jpg"
-        className="w-full h-full object-cover"
+        className="absolute inset-0 w-full h-full object-cover object-top"
         alt="Parque"
       />
-      <div className="absolute inset-0 bg-brand-text/50"></div>
+      <div className="absolute inset-0 bg-brand-text/45"></div>
     </div>
 
     <div className="max-w-7xl mx-auto px-6 relative z-10 w-full">
