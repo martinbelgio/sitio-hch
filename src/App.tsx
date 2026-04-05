@@ -110,22 +110,15 @@ const Quote = () => (
 // --- Home Page Components ---
 
 const HomeHero = () => (
-  <header className="relative min-h-screen flex items-center pt-32 pb-20 overflow-hidden bg-brand-text">
-    {/* Background Video */}
+  <header className="relative min-h-screen flex items-center pt-32 pb-20 overflow-hidden bg-brand-green">
+    {/* Background Image */}
     <div className="absolute inset-0 z-0 overflow-hidden">
-      <video
-        autoPlay
-        muted
-        loop
-        playsInline
-        className="w-full h-full object-cover opacity-30 grayscale"
-      >
-        <source 
-          src="https://player.vimeo.com/external/517090081.sd.mp4?s=67ed5727035425673339338d9739b30ca9683077&profile_id=164&oauth2_token_id=57447761" 
-          type="video/mp4" 
-        />
-      </video>
-      <div className="absolute inset-0 bg-gradient-to-b from-brand-text/80 via-brand-text/40 to-brand-text/90 backdrop-blur-[1px]"></div>
+      <img
+        src="/VerdeHero.jpg"
+        className="w-full h-full object-cover"
+        alt="Parque"
+      />
+      <div className="absolute inset-0 bg-brand-text/50"></div>
     </div>
 
     <div className="max-w-7xl mx-auto px-6 relative z-10 w-full">
@@ -332,7 +325,7 @@ const HomeServices = () => {
 const HomeCalculator = () => (
   <section id="calculador" className="py-40 px-6 relative overflow-hidden">
     <div className="absolute inset-0 z-0">
-      <img src="/imagenes/%20-6.jpg" className="w-full h-full object-cover" alt="Mar" />
+      <img src="/Mar.jpg" className="w-full h-full object-cover" alt="Mar" />
       <div className="absolute inset-0 bg-brand-bg/40 backdrop-blur-[1px]"></div>
     </div>
 
@@ -377,7 +370,7 @@ const HomeNewsletter = () => (
   <section className="grid md:grid-cols-2 border-t border-brand-border">
     <div className="h-[600px] relative overflow-hidden group">
       <img
-        src="/imagenes/%20-10.jpg"
+        src="/Escrito.jpg"
         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000 grayscale"
         alt="Escritura"
       />
@@ -405,7 +398,7 @@ const ReporteHero = () => (
     {/* Background: ventana */}
     <div className="absolute inset-0 z-0">
       <img
-        src="/imagenes/%F0%9F%AA%A9.jpg"
+        src="/Ventana.jpg"
         className="w-full h-full object-cover"
         alt="Ventana al mar"
       />
