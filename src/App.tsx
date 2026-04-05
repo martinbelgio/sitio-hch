@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence, useScroll, useTransform, useMotionValue, useSpring } from 'motion/react';
 import { Menu, X, ArrowUpRight, Plus } from 'lucide-react';
@@ -1292,12 +1292,14 @@ const AppContent = () => {
     <div className="min-h-screen selection:bg-brand-orange selection:text-brand-bg">
       <Navbar />
       <AnimatePresence mode="wait">
-        <Routes location={location} key={location.pathname}>
-          <Route path="/" element={<PageTransition><Home /></PageTransition>} />
-          <Route path="/reporte" element={<PageTransition><Reporte /></PageTransition>} />
-          <Route path="/raices" element={<PageTransition><Raices /></PageTransition>} />
-          <Route path="/acompanamiento" element={<PageTransition><Acompanamiento /></PageTransition>} />
-        </Routes>
+        <motion.div key={location.pathname} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.4 }}>
+          <Routes location={location}>
+            <Route path="/" element={<Home />} />
+            <Route path="/reporte" element={<Reporte />} />
+            <Route path="/raices" element={<Raices />} />
+            <Route path="/acompanamiento" element={<Acompanamiento />} />
+          </Routes>
+        </motion.div>
       </AnimatePresence>
       <Footer />
     </div>
