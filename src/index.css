@@ -22,10 +22,6 @@
 }
 
 @layer base {
-  *, *::before, *::after {
-    cursor: none !important;
-  }
-
   body {
     @apply bg-brand-bg text-brand-text font-sans antialiased;
   }
@@ -52,7 +48,7 @@
   }
   .highlight-orange::after {
     content: '';
-    @apply absolute bottom-[10%] left-[-2%] w-[104%] h-[35%] z-[-1] rounded-sm rotate-[-0.5deg] bg-brand-orange/30;
+    @apply absolute bottom-[10%] left-[-2%] w-[104%] h-[35%] z-[-1] rounded-sm rotate-[-0.5deg] bg-brand-orange/60;
   }
 
   .highlight-green {
@@ -60,7 +56,7 @@
   }
   .highlight-green::after {
     content: '';
-    @apply absolute bottom-[10%] left-[-2%] w-[104%] h-[35%] z-[-1] rounded-sm rotate-[0.5deg] bg-brand-green/30;
+    @apply absolute bottom-[10%] left-[-2%] w-[104%] h-[35%] z-[-1] rounded-sm rotate-[0.5deg] bg-brand-green/60;
   }
 
   .highlight-blue {
@@ -68,7 +64,7 @@
   }
   .highlight-blue::after {
     content: '';
-    @apply absolute bottom-[10%] left-[-2%] w-[104%] h-[35%] z-[-1] rounded-sm rotate-[-0.8deg] bg-brand-blue/30;
+    @apply absolute bottom-[10%] left-[-2%] w-[104%] h-[35%] z-[-1] rounded-sm rotate-[-0.8deg] bg-brand-blue/60;
   }
 
   /* Organic Masks */

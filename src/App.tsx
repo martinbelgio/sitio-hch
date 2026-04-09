@@ -11,12 +11,14 @@ import Lenis from 'lenis';
 
 // --- Global Effects ---
 
+let lenisInstance: Lenis | null = null;
+
 const SmoothScroll = () => {
   useEffect(() => {
-    const lenis = new Lenis({ duration: 1.4, easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)) });
-    const raf = (time: number) => { lenis.raf(time); requestAnimationFrame(raf); };
+    lenisInstance = new Lenis({ duration: 1.4, easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)) });
+    const raf = (time: number) => { lenisInstance!.raf(time); requestAnimationFrame(raf); };
     requestAnimationFrame(raf);
-    return () => lenis.destroy();
+    return () => { lenisInstance?.destroy(); lenisInstance = null; };
   }, []);
   return null;
 };
@@ -64,7 +66,7 @@ const RevealText = ({ children, className = '', delay = 0 }: { children: React.R
 
 const ImageReveal = ({ src, alt, className = '' }: { src: string; alt: string; className?: string }) => (
   <motion.div
-    className="overflow-hidden"
+    className="overflow-hidden h-full w-full"
     initial={{ clipPath: 'inset(100% 0% 0% 0%)' }}
     whileInView={{ clipPath: 'inset(0% 0% 0% 0%)' }}
     viewport={{ once: true, margin: '-100px' }}
@@ -161,6 +163,7 @@ const Navbar = () => {
 
         {/* Desktop Links */}
         <div className="hidden md:flex items-center gap-10 text-[13px] uppercase tracking-widest font-medium">
+          <Link to="/sobre-mi" className="hover:text-brand-orange transition-colors">Sobre mí</Link>
           <Link to="/reporte" className="hover:text-brand-orange transition-colors">Reporte</Link>
           <Link to="/raices" className="hover:text-brand-orange transition-colors">Echar Raíces</Link>
           <Link to="/acompanamiento" className="hover:text-brand-orange transition-colors">Acompañamiento</Link>
@@ -182,6 +185,7 @@ const Navbar = () => {
             exit={{ opacity: 0, y: -20 }}
             className="absolute top-full left-0 w-full bg-brand-bg border-b border-brand-border p-8 flex flex-col gap-6 text-center md:hidden"
           >
+            <Link to="/sobre-mi">Sobre mí</Link>
             <Link to="/reporte">Reporte</Link>
             <Link to="/raices">Echar Raíces</Link>
             <Link to="/acompanamiento">Acompañamiento</Link>
@@ -218,7 +222,7 @@ const Quote = () => (
         alt="Mountain landscape"
         referrerPolicy="no-referrer"
       />
-      <div className="absolute inset-0 bg-brand-bg/80 backdrop-blur-[2px]"></div>
+      <div className="absolute inset-0 bg-brand-bg/50 backdrop-blur-[1px]"></div>
     </div>
     
     <motion.div 
@@ -271,7 +275,7 @@ const HomeHero = () => {
           translateY: mouse.y,
         }}
       />
-      <div className="absolute inset-0 bg-brand-text/50"></div>
+      <div className="absolute inset-0 bg-brand-text/30"></div>
     </div>
 
     <div className="max-w-7xl mx-auto px-6 relative z-10 w-full">
@@ -501,7 +505,7 @@ const HomeCalculator = () => (
   <section id="calculador" className="py-40 px-6 relative overflow-hidden">
     <div className="absolute inset-0 z-0">
       <img src="/Mar.jpg" className="w-full h-full object-cover" alt="Mar" />
-      <div className="absolute inset-0 bg-brand-bg/40 backdrop-blur-[1px]"></div>
+      <div className="absolute inset-0 bg-brand-bg/15"></div>
     </div>
 
     <div className="max-w-7xl mx-auto relative z-10 grid md:grid-cols-[1fr_1.5fr] gap-24 items-center">
@@ -547,7 +551,7 @@ const HomeCalculator = () => (
 const HomeNewsletter = () => (
   <section className="grid md:grid-cols-2 border-t border-brand-border">
     <div className="h-[600px] relative overflow-hidden">
-      <ImageReveal src="/Escrito.jpg" alt="Escritura" className="w-full h-full object-cover grayscale" />
+      <ImageReveal src="/Escrito.jpg" alt="Escritura" className="w-full h-full object-cover" />
       <div className="absolute inset-0 bg-brand-orange/5 mix-blend-multiply pointer-events-none"></div>
     </div>
     <div className="p-12 md:p-24 flex flex-col justify-center bg-brand-bg">
@@ -578,7 +582,7 @@ const ReporteHero = () => (
         className="w-full h-full object-cover"
         alt="Ventana al mar"
       />
-      <div className="absolute inset-0 bg-brand-bg/40 backdrop-blur-[1px]"></div>
+      <div className="absolute inset-0 bg-brand-bg/20"></div>
     </div>
 
     <div className="relative z-10 pt-48 pb-24 px-6 max-w-7xl mx-auto w-full">
@@ -628,12 +632,11 @@ const ReporteIntro = () => (
 const PhotoBreak = () => (
   <div className="h-[70vh] relative overflow-hidden">
     <img 
-      src="https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&q=80&w=1920" 
-      className="w-full h-full object-cover grayscale"
+      src="https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&q=80&w=1920"
+      className="w-full h-full object-cover"
       alt="Artistic desk"
       referrerPolicy="no-referrer"
     />
-    <div className="absolute inset-0 bg-brand-text/20"></div>
     <div className="absolute inset-0 flex items-center justify-center px-6">
       <p className="text-4xl md:text-7xl font-serif italic text-brand-bg leading-tight text-center max-w-5xl">
         "Tu diseño, documentado para<br />volver cuando lo necesites."
@@ -681,7 +684,7 @@ const ReporteFeatures = () => {
 };
 
 const ForWhom = () => (
-  <section className="py-32 px-6 bg-brand-text text-brand-bg border-y border-brand-border">
+  <section className="py-32 px-6 bg-brand-blue text-brand-bg border-y border-brand-border">
     <div className="max-w-7xl mx-auto">
       <span className="text-xs uppercase tracking-widest opacity-50 mb-6 block">Para quién</span>
       <h2 className="text-4xl md:text-5xl font-serif mb-16">Este reporte<br />es para vos si...</h2>
@@ -803,9 +806,9 @@ const RaicesHero = () => (
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 1.5 }}
     >
-      <div className="aspect-[4/5] mask-arch overflow-hidden shadow-2xl grayscale">
-        <img 
-          src="https://images.unsplash.com/photo-1515377905703-c4788e51af15?auto=format&fit=crop&q=80&w=1000" 
+      <div className="aspect-[4/5] mask-arch overflow-hidden shadow-2xl">
+        <img
+          src="https://images.unsplash.com/photo-1515377905703-c4788e51af15?auto=format&fit=crop&q=80&w=1000"
           className="w-full h-full object-cover"
           alt="Hands writing"
           referrerPolicy="no-referrer"
@@ -885,7 +888,7 @@ const RaicesFeatures = () => {
 };
 
 const RaicesForWhom = () => (
-  <section className="py-32 px-6 bg-brand-text text-brand-bg border-y border-brand-border">
+  <section className="py-32 px-6 bg-brand-green text-brand-bg border-y border-brand-border">
     <div className="max-w-7xl mx-auto">
       <span className="text-xs uppercase tracking-widest opacity-50 mb-6 block">Para quién</span>
       <h2 className="text-4xl md:text-5xl font-serif mb-16">Esta lectura<br />es para vos si...</h2>
@@ -1029,9 +1032,9 @@ const AcompanamientoHero = () => (
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 1.5 }}
     >
-      <div className="aspect-[4/5] mask-blob-2 overflow-hidden shadow-2xl grayscale">
-        <img 
-          src="https://images.unsplash.com/photo-1516414447565-b14be0adf13e?auto=format&fit=crop&q=80&w=1000" 
+      <div className="aspect-[4/5] mask-blob-2 overflow-hidden shadow-2xl">
+        <img
+          src="https://images.unsplash.com/photo-1516414447565-b14be0adf13e?auto=format&fit=crop&q=80&w=1000"
           className="w-full h-full object-cover"
           alt="Artistic process"
           referrerPolicy="no-referrer"
@@ -1141,7 +1144,7 @@ const AcompanamientoIncludes = () => {
 };
 
 const AcompanamientoForWhom = () => (
-  <section className="py-32 px-6 bg-brand-text text-brand-bg border-y border-brand-border">
+  <section className="py-32 px-6 bg-brand-orange text-brand-bg border-y border-brand-border">
     <div className="max-w-7xl mx-auto">
       <div className="max-w-4xl">
         <span className="text-xs uppercase tracking-widest opacity-50 mb-6 block">Para quién</span>
@@ -1243,10 +1246,51 @@ const Home = () => (
     <HomeHero />
     <HomeMarquee />
     <HomeManifesto />
-    <HomeAbout />
     <HomeServices />
     <HomeCalculator />
     <HomeNewsletter />
+    <Quote />
+  </>
+);
+
+const SobreMiPage = () => (
+  <>
+    <section className="py-40 px-6 max-w-7xl mx-auto border-t border-brand-border pt-48">
+      <div className="grid md:grid-cols-[1fr_1.5fr] gap-24">
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          className="relative"
+        >
+          <div className="aspect-square mask-blob-2 overflow-hidden shadow-2xl mb-12 hover:scale-[1.02] transition-all duration-1000">
+            <img
+              src="https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&q=80&w=800"
+              className="w-full h-full object-cover"
+              alt="Martin Belgio"
+              referrerPolicy="no-referrer"
+            />
+          </div>
+        </motion.div>
+
+        <div className="flex flex-col justify-center">
+          <span className="text-[10px] uppercase tracking-[0.4em] opacity-40 mb-10 block font-bold">Quién soy</span>
+          <RevealText>
+            <h1 className="text-5xl md:text-7xl font-serif leading-[1.1] mb-12">
+              No soy un gurú.<br />
+              <span className="italic text-brand-orange">Soy un practicante.</span>
+            </h1>
+          </RevealText>
+          <div className="space-y-8 text-xl opacity-80 leading-relaxed font-light">
+            <p>
+              Llegué al Diseño Humano buscando respuestas a un cansancio que no se iba con vacaciones. Encontré una herramienta que no me pedía ser "mejor", sino ser yo mismo.
+            </p>
+            <p>
+              Mi enfoque es práctico y despojado de misticismo innecesario. No te voy a decir qué hacer con tu vida, te voy a mostrar cómo funciona tu motor para que vos tomes tus propias decisiones con claridad.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
     <Quote />
   </>
 );
@@ -1296,7 +1340,35 @@ const Acompanamiento = () => (
 
 const ScrollToTop = () => {
   const { pathname } = useLocation();
-  useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
+  useEffect(() => {
+    if (lenisInstance) {
+      lenisInstance.scrollTo(0, { immediate: true });
+    } else {
+      window.scrollTo(0, 0);
+    }
+  }, [pathname]);
+  return null;
+};
+
+const HashScroll = () => {
+  const { pathname, hash } = useLocation();
+  useEffect(() => {
+    if (!hash) return;
+    const id = hash.replace('#', '');
+    const tryScroll = (attempts = 0) => {
+      const el = document.getElementById(id);
+      if (el) {
+        if (lenisInstance) {
+          lenisInstance.scrollTo(el, { offset: -80 });
+        } else {
+          el.scrollIntoView({ behavior: 'smooth' });
+        }
+      } else if (attempts < 15) {
+        setTimeout(() => tryScroll(attempts + 1), 100);
+      }
+    };
+    setTimeout(tryScroll, 150);
+  }, [pathname, hash]);
   return null;
 };
 
@@ -1309,6 +1381,7 @@ const AppContent = () => {
         <motion.div key={location.pathname} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.4 }}>
           <Routes location={location}>
             <Route path="/" element={<Home />} />
+            <Route path="/sobre-mi" element={<SobreMiPage />} />
             <Route path="/reporte" element={<Reporte />} />
             <Route path="/raices" element={<Raices />} />
             <Route path="/acompanamiento" element={<Acompanamiento />} />
@@ -1324,9 +1397,9 @@ export default function App() {
   return (
     <>
       <SmoothScroll />
-      <CustomCursor />
       <Router>
         <ScrollToTop />
+        <HashScroll />
         <AppContent />
       </Router>
     </>
