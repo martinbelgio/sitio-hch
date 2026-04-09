@@ -167,7 +167,7 @@ const Navbar = () => {
           <Link to="/reporte" className="hover:text-brand-orange transition-colors">Reporte</Link>
           <Link to="/raices" className="hover:text-brand-orange transition-colors">Echar Raíces</Link>
           <Link to="/acompanamiento" className="hover:text-brand-orange transition-colors">Acompañamiento</Link>
-          <Link to="/#calculador" className={`px-6 py-2.5 border rounded-full transition-all ${scrolled ? 'border-brand-text/20 hover:bg-brand-text hover:text-brand-bg' : 'border-white/40 hover:bg-white hover:text-brand-text'}`}>Calculá tu carta</Link>
+          <Link to="/#calculador" className={`px-6 py-2.5 border rounded-full transition-all hover:bg-brand-orange hover:text-white hover:border-brand-orange ${scrolled ? 'border-brand-text/20' : 'border-white/40'}`}>Calculá tu carta</Link>
         </div>
 
         {/* Mobile Toggle */}
@@ -551,8 +551,15 @@ const HomeCalculator = () => (
 const HomeNewsletter = () => (
   <section className="grid md:grid-cols-2 border-t border-brand-border">
     <div className="h-[600px] relative overflow-hidden">
-      <ImageReveal src="/Escrito.jpg" alt="Escritura" className="w-full h-full object-cover" />
-      <div className="absolute inset-0 bg-brand-orange/5 mix-blend-multiply pointer-events-none"></div>
+      <motion.img
+        src="/Escrito.jpg"
+        alt="Escritura"
+        className="w-full h-full object-cover"
+        initial={{ opacity: 0, scale: 1.05 }}
+        whileInView={{ opacity: 1, scale: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+      />
     </div>
     <div className="p-12 md:p-24 flex flex-col justify-center bg-brand-bg">
       <span className="text-[10px] uppercase tracking-[0.4em] opacity-40 mb-10 block font-bold">Newsletter</span>
