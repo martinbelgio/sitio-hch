@@ -3,10 +3,140 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
-import { motion, AnimatePresence } from 'motion/react';
-import { Menu, X, Instagram, ArrowUpRight, CheckCircle2, Plus } from 'lucide-react';
+import { motion, AnimatePresence, useScroll, useTransform, useMotionValue, useSpring } from 'motion/react';
+import { Menu, X, ArrowUpRight, Plus } from 'lucide-react';
+import Lenis from 'lenis';
+
+// --- Global Effects ---
+
+const SmoothScroll = () => {
+  useEffect(() => {
+    const lenis = new Lenis({ duration: 1.4, easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)) });
+    const raf = (time: number) => { lenis.raf(time); requestAnimationFrame(raf); };
+    requestAnimationFrame(raf);
+    return () => lenis.destroy();
+  }, []);
+  return null;
+};
+
+const CustomCursor = () => {
+  const cursorX = useMotionValue(-100);
+  const cursorY = useMotionValue(-100);
+  const followerX = useSpring(cursorX, { damping: 30, stiffness: 80 });
+  const followerY = useSpring(cursorY, { damping: 30, stiffness: 80 });
+  const [hovered, setHovered] = useState(false);
+
+  useEffect(() => {
+    const move = (e: MouseEvent) => { cursorX.set(e.clientX); cursorY.set(e.clientY); };
+    const over = (e: MouseEvent) => { if ((e.target as Element).closest('a,button')) setHovered(true); };
+    const out = () => setHovered(false);
+    window.addEventListener('mousemove', move);
+    window.addEventListener('mouseover', over);
+    window.addEventListener('mouseout', out);
+    return () => { window.removeEventListener('mousemove', move); window.removeEventListener('mouseover', over); window.removeEventListener('mouseout', out); };
+  }, []);
+
+  return (
+    <>
+      <motion.div className="fixed top-0 left-0 z-[9999] pointer-events-none rounded-full bg-brand-orange mix-blend-difference"
+        style={{ x: cursorX, y: cursorY, translateX: '-50%', translateY: '-50%', width: hovered ? 48 : 8, height: hovered ? 48 : 8, transition: 'width 0.3s ease, height 0.3s ease' }} />
+      <motion.div className="fixed top-0 left-0 z-[9998] pointer-events-none rounded-full border border-brand-orange/40"
+        style={{ x: followerX, y: followerY, translateX: '-50%', translateY: '-50%', width: hovered ? 0 : 32, height: hovered ? 0 : 32, transition: 'width 0.3s ease, height 0.3s ease' }} />
+    </>
+  );
+};
+
+const RevealText = ({ children, className = '', delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) => (
+  <div className="overflow-hidden">
+    <motion.div
+      initial={{ y: '110%', opacity: 0 }}
+      whileInView={{ y: 0, opacity: 1 }}
+      viewport={{ once: true, margin: '-80px' }}
+      transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay }}
+      className={className}
+    >
+      {children}
+    </motion.div>
+  </div>
+);
+
+const ImageReveal = ({ src, alt, className = '' }: { src: string; alt: string; className?: string }) => (
+  <motion.div
+    className="overflow-hidden"
+    initial={{ clipPath: 'inset(100% 0% 0% 0%)' }}
+    whileInView={{ clipPath: 'inset(0% 0% 0% 0%)' }}
+    viewport={{ once: true, margin: '-100px' }}
+    transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+  >
+    <motion.img
+      src={src} alt={alt}
+      className={className}
+      initial={{ scale: 1.15 }}
+      whileInView={{ scale: 1 }}
+      viewport={{ once: true }}
+      transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1] }}
+    />
+  </motion.div>
+);
+
+const MagneticButton = ({ children, className = '', href, onClick }: { children: React.ReactNode; className?: string; href?: string; onClick?: () => void }) => {
+  const ref = useRef<HTMLDivElement>(null);
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  const xSpring = useSpring(x, { stiffness: 150, damping: 15 });
+  const ySpring = useSpring(y, { stiffness: 150, damping: 15 });
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    const rect = ref.current!.getBoundingClientRect();
+    x.set((e.clientX - rect.left - rect.width / 2) * 0.4);
+    y.set((e.clientY - rect.top - rect.height / 2) * 0.4);
+  };
+  const handleMouseLeave = () => { x.set(0); y.set(0); };
+
+  const Tag = href ? 'a' : 'button';
+  return (
+    <div ref={ref} onMouseMove={handleMouseMove} onMouseLeave={handleMouseLeave} className="inline-block">
+      <motion.div style={{ x: xSpring, y: ySpring }}>
+        <Tag href={href} onClick={onClick} className={className}>{children}</Tag>
+      </motion.div>
+    </div>
+  );
+};
+
+const TiltCard = ({ children, className = '' }: { children: React.ReactNode; className?: string }) => {
+  const ref = useRef<HTMLDivElement>(null);
+  const [tilt, setTilt] = useState({ x: 0, y: 0 });
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    const rect = ref.current!.getBoundingClientRect();
+    const x = ((e.clientY - rect.top - rect.height / 2) / rect.height) * 8;
+    const y = -((e.clientX - rect.left - rect.width / 2) / rect.width) * 8;
+    setTilt({ x, y });
+  };
+  const handleMouseLeave = () => setTilt({ x: 0, y: 0 });
+
+  return (
+    <div ref={ref} onMouseMove={handleMouseMove} onMouseLeave={handleMouseLeave}
+      style={{ transform: `perspective(1000px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`, transition: 'transform 0.1s ease' }}
+      className={className}
+    >
+      {children}
+    </div>
+  );
+};
+
+const PageTransition = ({ children }: { children: React.ReactNode }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 24 }}
+    animate={{ opacity: 1, y: 0 }}
+    exit={{ opacity: 0, y: -16 }}
+    transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+  >
+    {children}
+  </motion.div>
+);
 
 // --- Shared Components ---
 
@@ -25,16 +155,16 @@ const Navbar = () => {
   useEffect(() => setIsOpen(false), [location]);
 
   return (
-    <nav className={`fixed w-full top-0 z-50 transition-all duration-300 ${scrolled ? 'bg-brand-bg/90 backdrop-blur-md border-b border-brand-border py-4' : 'py-6'}`}>
+    <nav className={`fixed w-full top-0 z-50 transition-all duration-300 ${scrolled ? 'bg-brand-bg/90 backdrop-blur-md border-b border-brand-border py-4 text-brand-text' : 'py-6 text-white'}`}>
       <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
         <Link to="/" className="font-serif italic text-2xl font-medium tracking-tight">Martin Belgio</Link>
-        
+
         {/* Desktop Links */}
         <div className="hidden md:flex items-center gap-10 text-[13px] uppercase tracking-widest font-medium">
           <Link to="/reporte" className="hover:text-brand-orange transition-colors">Reporte</Link>
           <Link to="/raices" className="hover:text-brand-orange transition-colors">Echar Raíces</Link>
           <Link to="/acompanamiento" className="hover:text-brand-orange transition-colors">Acompañamiento</Link>
-          <Link to="/#calculador" className="px-6 py-2.5 border border-brand-text/20 rounded-full hover:bg-brand-text hover:text-brand-bg transition-all">Calculá tu carta</Link>
+          <Link to="/#calculador" className={`px-6 py-2.5 border rounded-full transition-all ${scrolled ? 'border-brand-text/20 hover:bg-brand-text hover:text-brand-bg' : 'border-white/40 hover:bg-white hover:text-brand-text'}`}>Calculá tu carta</Link>
         </div>
 
         {/* Mobile Toggle */}
@@ -109,50 +239,77 @@ const Quote = () => (
 
 // --- Home Page Components ---
 
-const HomeHero = () => (
-  <header className="relative min-h-screen flex items-center pt-32 pb-20 overflow-hidden bg-brand-text">
-    {/* Background Video */}
-    <div className="absolute inset-0 z-0 overflow-hidden">
-      <video
-        autoPlay
-        muted
-        loop
-        playsInline
-        className="w-full h-full object-cover opacity-30 grayscale"
-      >
-        <source 
-          src="https://player.vimeo.com/external/517090081.sd.mp4?s=67ed5727035425673339338d9739b30ca9683077&profile_id=164&oauth2_token_id=57447761" 
-          type="video/mp4" 
-        />
-      </video>
-      <div className="absolute inset-0 bg-gradient-to-b from-brand-text/80 via-brand-text/40 to-brand-text/90 backdrop-blur-[1px]"></div>
+const HomeHero = () => {
+  const heroRef = useRef<HTMLElement>(null);
+  const { scrollY } = useScroll();
+  const imageY = useTransform(scrollY, [0, 700], [0, 180]);
+  const contentY = useTransform(scrollY, [0, 700], [0, -60]);
+  const [mouse, setMouse] = useState({ x: 0, y: 0 });
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!heroRef.current) return;
+    const rect = heroRef.current.getBoundingClientRect();
+    setMouse({
+      x: ((e.clientX - rect.left) / rect.width - 0.5) * 24,
+      y: ((e.clientY - rect.top) / rect.height - 0.5) * 16,
+    });
+  };
+
+  return (
+  <header ref={heroRef} onMouseMove={handleMouseMove}
+    className="relative min-h-screen flex items-center py-32 overflow-hidden" style={{backgroundColor: '#2a3d2a'}}>
+    {/* Background Image with parallax */}
+    <div className="absolute inset-0 z-0">
+      <motion.img
+        src="/VerdeHero.jpg"
+        className="absolute inset-0 w-full h-full object-cover object-top"
+        alt="Parque"
+        style={{
+          y: imageY,
+          x: mouse.x,
+          scale: 1.15,
+          translateY: mouse.y,
+        }}
+      />
+      <div className="absolute inset-0 bg-brand-text/50"></div>
     </div>
 
     <div className="max-w-7xl mx-auto px-6 relative z-10 w-full">
       <motion.div
         initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
+        animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 1.2, ease: "easeOut" }}
-        className="max-w-5xl"
       >
-        <div className="inline-block mb-10 px-5 py-2 border border-white/20 rounded-full text-[10px] uppercase tracking-[0.4em] text-brand-orange font-bold bg-white/5 backdrop-blur-sm">
+        {/* Tagline */}
+        <div className="mb-10 text-[11px] uppercase tracking-[0.4em] text-white/50 font-medium">
           Diseño Humano para la vida real
         </div>
-        <h1 className="text-5xl md:text-[10rem] font-serif leading-[0.85] tracking-tighter mb-12 text-white">
-          Naciste con un<br />
-          <span className="italic text-brand-orange">diseño único.</span><br />
-          <span>Volvé a vos.</span>
-        </h1>
-        <div className="grid md:grid-cols-[1.5fr_1fr] gap-12 items-end">
-          <p className="text-xl md:text-2xl text-white/70 leading-relaxed font-light">
-            No es un proyecto de optimización personal. Es recuperar tu manual de usuario original y entender cómo funciona tu energía, <span className="font-hand text-4xl text-brand-orange ml-1">sin urgencias.</span>
-          </p>
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-10">
-            <a href="#servicios" className="px-12 py-6 bg-brand-orange text-brand-bg rounded-full font-medium hover:scale-105 transition-all shadow-2xl shadow-brand-orange/20">
-              Empezar el viaje
-            </a>
-            <div className="text-sm text-white/40 font-medium tracking-[0.2em] uppercase">
-              ✦ Tu estrategia<br />✦ Tu autoridad
+
+        {/* Two-column layout: title left, description right */}
+        <div className="grid md:grid-cols-[1fr_1fr] lg:grid-cols-[1.1fr_0.9fr] gap-12 lg:gap-20 items-end">
+
+          {/* Left: Title */}
+          <div>
+            <h1 className="text-6xl md:text-7xl lg:text-8xl font-serif leading-[0.9] tracking-tighter text-white">
+              Naciste con un<br />
+              <span className="italic">diseño único.</span><br />
+              Volvé a vos.
+            </h1>
+            <div className="mt-12">
+              <MagneticButton href="#servicios" className="inline-block px-10 py-5 bg-brand-orange text-brand-bg rounded-full font-medium hover:scale-105 transition-all shadow-2xl shadow-brand-orange/20">
+                Empezar el viaje
+              </MagneticButton>
+            </div>
+          </div>
+
+          {/* Right: Description */}
+          <div className="md:pt-8">
+            <p className="text-lg md:text-xl text-white/65 leading-relaxed font-light mb-10">
+              No es un proyecto de optimización personal. Es recuperar tu manual de usuario original y entender cómo funciona tu energía, sin urgencias.
+            </p>
+            <div className="text-sm text-white/35 font-medium tracking-[0.2em] uppercase space-y-2">
+              <div>✦ Tu estrategia</div>
+              <div>✦ Tu autoridad</div>
             </div>
           </div>
         </div>
@@ -165,13 +322,15 @@ const HomeHero = () => (
         animate={{ rotate: 360 }}
         transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
         className="w-32 h-32 border border-white/10 rounded-full flex items-center justify-center"
+        style={{ willChange: 'transform' }}
       >
         <div className="w-1 h-1 bg-brand-orange rounded-full"></div>
         <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 bg-white/20 rounded-full"></div>
       </motion.div>
     </div>
   </header>
-);
+  );
+};
 
 const HomeMarquee = () => (
   <div className="bg-brand-orange text-brand-bg py-6 overflow-hidden border-y border-brand-orange/20 mt-20">
@@ -195,10 +354,12 @@ const HomeManifesto = () => (
         className="relative"
       >
         <span className="text-[10px] uppercase tracking-[0.4em] opacity-40 mb-10 block font-bold">01 — El Contexto</span>
-        <h2 className="text-5xl md:text-7xl font-serif leading-[1.1] mb-12">
-          El entorno escribe sobre lo que sos.<br />
-          Pero lo que sos <span className="italic text-brand-green">no desaparece.</span>
-        </h2>
+        <RevealText>
+          <h2 className="text-5xl md:text-7xl font-serif leading-[1.1] mb-12">
+            El entorno escribe sobre lo que sos.<br />
+            Pero lo que sos <span className="italic text-brand-green">no desaparece.</span>
+          </h2>
+        </RevealText>
         <div className="space-y-8 text-xl opacity-80 leading-relaxed max-w-xl font-light">
           <p>
             Todos llegamos al mundo con un diseño. Una forma particular de procesar la energía, de tomar decisiones, de relacionarnos con el trabajo y con los demás. Eso no se elige: viene dado.
@@ -255,10 +416,12 @@ const HomeAbout = () => (
       
       <div className="flex flex-col justify-center">
         <span className="text-[10px] uppercase tracking-[0.4em] opacity-40 mb-10 block font-bold">02 — Quién soy</span>
-        <h2 className="text-5xl md:text-7xl font-serif leading-[1.1] mb-12">
-          No soy un gurú.<br />
-          <span className="italic text-brand-orange">Soy un practicante.</span>
-        </h2>
+        <RevealText>
+          <h2 className="text-5xl md:text-7xl font-serif leading-[1.1] mb-12">
+            No soy un gurú.<br />
+            <span className="italic text-brand-orange">Soy un practicante.</span>
+          </h2>
+        </RevealText>
         <div className="space-y-8 text-xl opacity-80 leading-relaxed font-light">
           <p>
             Llegué al Diseño Humano buscando respuestas a un cansancio que no se iba con vacaciones. Encontré una herramienta que no me pedía ser "mejor", sino ser yo mismo.
@@ -301,7 +464,9 @@ const HomeServices = () => {
     <section id="servicios" className="py-40 px-6 max-w-7xl mx-auto border-t border-brand-border">
       <div className="mb-24">
         <span className="text-[10px] uppercase tracking-[0.4em] opacity-40 mb-10 block font-bold">03 — El Trabajo</span>
-        <h2 className="text-5xl md:text-7xl font-serif">Formas de <span className="italic text-brand-blue">leer tu diseño</span></h2>
+        <RevealText>
+          <h2 className="text-5xl md:text-7xl font-serif">Formas de <span className="italic text-brand-blue">leer tu diseño</span></h2>
+        </RevealText>
       </div>
 
       <div className="space-y-0 border-t border-brand-border">
@@ -311,17 +476,20 @@ const HomeServices = () => {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ delay: idx * 0.1 }}
+            className="border-b border-brand-border"
           >
-            <Link
-              to={service.href}
-              className="group grid md:grid-cols-[1fr_2fr_auto] items-center py-14 border-b border-brand-border hover:bg-brand-text/5 transition-all duration-500 px-4 -mx-4 rounded-xl"
-            >
-              <span className="text-[10px] uppercase tracking-widest opacity-40 font-bold">{service.meta}</span>
-              <span className={`text-4xl md:text-6xl font-serif italic transition-all duration-500 group-hover:pl-8 ${service.color}`}>{service.name}</span>
-              <div className="w-16 h-16 rounded-full border border-brand-border flex items-center justify-center group-hover:bg-brand-text group-hover:text-brand-bg transition-all duration-500">
-                <ArrowUpRight size={24} />
-              </div>
-            </Link>
+            <TiltCard>
+              <Link
+                to={service.href}
+                className="group grid md:grid-cols-[1fr_2fr_auto] items-center py-14 hover:bg-brand-text/5 transition-all duration-500 px-4 -mx-4 rounded-xl"
+              >
+                <span className="text-[10px] uppercase tracking-widest opacity-40 font-bold">{service.meta}</span>
+                <span className={`text-4xl md:text-6xl font-serif italic transition-all duration-500 group-hover:pl-8 ${service.color}`}>{service.name}</span>
+                <div className="w-16 h-16 rounded-full border border-brand-border flex items-center justify-center group-hover:bg-brand-text group-hover:text-brand-bg transition-all duration-500">
+                  <ArrowUpRight size={24} />
+                </div>
+              </Link>
+            </TiltCard>
           </motion.div>
         ))}
       </div>
@@ -332,17 +500,19 @@ const HomeServices = () => {
 const HomeCalculator = () => (
   <section id="calculador" className="py-40 px-6 relative overflow-hidden">
     <div className="absolute inset-0 z-0">
-      <img src="/imagenes/%20-6.jpg" className="w-full h-full object-cover" alt="Mar" />
+      <img src="/Mar.jpg" className="w-full h-full object-cover" alt="Mar" />
       <div className="absolute inset-0 bg-brand-bg/40 backdrop-blur-[1px]"></div>
     </div>
 
     <div className="max-w-7xl mx-auto relative z-10 grid md:grid-cols-[1fr_1.5fr] gap-24 items-center">
       <div>
         <span className="text-[10px] uppercase tracking-[0.4em] opacity-40 mb-10 block font-bold">04 — Tu punto de partida</span>
-        <h2 className="text-5xl md:text-7xl font-serif leading-[1.1] mb-10">
-          Calculá tu carta.<br />
-          <span className="italic text-brand-blue">Es gratis.</span>
-        </h2>
+        <RevealText>
+          <h2 className="text-5xl md:text-7xl font-serif leading-[1.1] mb-10">
+            Calculá tu carta.<br />
+            <span className="italic text-brand-blue">Es gratis.</span>
+          </h2>
+        </RevealText>
         <p className="text-xl opacity-80 leading-relaxed mb-10 font-light">
           Necesitás tu fecha, hora exacta y ciudad de nacimiento. La hora importa: una diferencia de una hora puede cambiar tu tipo o tu autoridad.
         </p>
@@ -362,9 +532,10 @@ const HomeCalculator = () => (
         <div className="bg-white p-4 rounded-[2rem] shadow-2xl border border-brand-border">
           <iframe
             id="chartWidget"
-            src="https://neutrinoplatform.com/widget/chart/new?apiKey=a61fa305b92964b4afd2ec35a29e1251b9db90e8"
+            src={`https://neutrinoplatform.com/widget/chart/new?apiKey=${import.meta.env.VITE_NEUTRINO_API_KEY}`}
             className="w-full h-[600px] border-none rounded-[1.5rem]"
             title="Calculadora de Diseño Humano"
+            sandbox="allow-scripts allow-forms allow-same-origin"
           ></iframe>
         </div>
         <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-brand-orange/10 rounded-full blur-2xl -z-10"></div>
@@ -375,24 +546,22 @@ const HomeCalculator = () => (
 
 const HomeNewsletter = () => (
   <section className="grid md:grid-cols-2 border-t border-brand-border">
-    <div className="h-[600px] relative overflow-hidden group">
-      <img
-        src="/imagenes/%20-10.jpg"
-        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000 grayscale"
-        alt="Escritura"
-      />
-      <div className="absolute inset-0 bg-brand-orange/5 mix-blend-multiply"></div>
+    <div className="h-[600px] relative overflow-hidden">
+      <ImageReveal src="/Escrito.jpg" alt="Escritura" className="w-full h-full object-cover grayscale" />
+      <div className="absolute inset-0 bg-brand-orange/5 mix-blend-multiply pointer-events-none"></div>
     </div>
     <div className="p-12 md:p-24 flex flex-col justify-center bg-brand-bg">
       <span className="text-[10px] uppercase tracking-[0.4em] opacity-40 mb-10 block font-bold">Newsletter</span>
-      <h2 className="text-5xl md:text-7xl font-serif mb-10">Volver a <span className="italic text-brand-orange">Narrarse</span></h2>
+      <RevealText>
+        <h2 className="text-5xl md:text-7xl font-serif mb-10">Volver a <span className="italic text-brand-orange">Narrarse</span></h2>
+      </RevealText>
       <p className="text-xl opacity-80 leading-relaxed mb-12 max-w-md font-light">
         Reflexiones semanales sobre Diseño Humano, la cultura de la optimización y el arte de dejar de intentar ser otra persona.
       </p>
       <div>
-        <a href="#" className="inline-flex items-center justify-center px-10 py-5 border border-brand-text/20 rounded-full hover:bg-brand-text hover:text-brand-bg transition-all font-medium">
+        <MagneticButton href="#" className="inline-flex items-center justify-center px-10 py-5 border border-brand-text/20 rounded-full hover:bg-brand-text hover:text-brand-bg transition-all font-medium">
           Leer en Substack ↗
-        </a>
+        </MagneticButton>
       </div>
     </div>
   </section>
@@ -405,7 +574,7 @@ const ReporteHero = () => (
     {/* Background: ventana */}
     <div className="absolute inset-0 z-0">
       <img
-        src="/imagenes/%F0%9F%AA%A9.jpg"
+        src="/Ventana.jpg"
         className="w-full h-full object-cover"
         alt="Ventana al mar"
       />
@@ -420,20 +589,22 @@ const ReporteHero = () => (
         className="max-w-3xl"
       >
         <span className="text-[10px] uppercase tracking-[0.4em] opacity-40 mb-10 block font-bold">Acceso a plataforma · Multiformato</span>
-        <h1 className="text-6xl md:text-8xl font-serif leading-[0.95] mb-12">
-          Tu Carta en<br />
-          <span className="italic text-brand-blue">Profundidad</span>
-        </h1>
+        <RevealText>
+          <h1 className="text-6xl md:text-8xl font-serif leading-[0.95] mb-12">
+            Tu Carta en<br />
+            <span className="italic text-brand-blue">Profundidad</span>
+          </h1>
+        </RevealText>
         <p className="text-xl md:text-2xl opacity-80 leading-relaxed max-w-lg mb-12 font-light">
           Portal personal con reporte a medida, videos, audios y workbook. Tu diseño documentado para experimentarlo a tu propio ritmo.
         </p>
         <div className="flex flex-wrap gap-6">
-          <a href="https://wa.me/TUNUMERO?text=Hola%20Martin%2C%20quiero%20pedir%20el%20Reporte%20(Argentina)" className="px-10 py-5 bg-brand-blue text-brand-text rounded-full font-medium hover:scale-105 transition-transform shadow-xl shadow-brand-blue/20">
+          <MagneticButton href="https://wa.me/TUNUMERO?text=Hola%20Martin%2C%20quiero%20pedir%20el%20Reporte%20(Argentina)" className="px-10 py-5 bg-brand-blue text-brand-text rounded-full font-medium hover:scale-105 transition-transform shadow-xl shadow-brand-blue/20">
             Pedir desde Argentina
-          </a>
-          <a href="https://wa.me/TUNUMERO?text=Hola%20Martin%2C%20quiero%20pedir%20el%20Reporte%20(Exterior)" className="px-10 py-5 border border-brand-text/20 rounded-full font-medium hover:bg-brand-text hover:text-brand-bg transition-all">
+          </MagneticButton>
+          <MagneticButton href="https://wa.me/TUNUMERO?text=Hola%20Martin%2C%20quiero%20pedir%20el%20Reporte%20(Exterior)" className="px-10 py-5 border border-brand-text/20 rounded-full font-medium hover:bg-brand-text hover:text-brand-bg transition-all">
             Pedir desde el Exterior
-          </a>
+          </MagneticButton>
         </div>
       </motion.div>
     </div>
@@ -612,17 +783,19 @@ const RaicesHero = () => (
       transition={{ duration: 1 }}
     >
       <span className="text-[10px] uppercase tracking-[0.4em] opacity-40 mb-10 block font-bold">Sesión en vivo · 1 hora</span>
-      <h1 className="text-6xl md:text-8xl font-serif leading-[0.95] mb-12">
-        Lectura<br />
-        <span className="italic text-brand-green">Echar Raíces</span>
-      </h1>
+      <RevealText>
+        <h1 className="text-6xl md:text-8xl font-serif leading-[0.95] mb-12">
+          Lectura<br />
+          <span className="italic text-brand-green">Echar Raíces</span>
+        </h1>
+      </RevealText>
       <p className="text-xl md:text-2xl opacity-80 leading-relaxed max-w-lg mb-12 font-light">
         Para quienes acaban de calcular su carta o nunca la leyeron en vivo. Una hora de conversación real, con tu carta como punto de partida y tu vida como contexto.
       </p>
       <div className="flex flex-wrap gap-6">
-        <a href="https://wa.me/TUNUMERO?text=Hola%20Martin%2C%20quiero%20agendar%20la%20lectura%20Echar%20Ra%C3%ADces" className="px-10 py-5 bg-brand-green text-brand-bg rounded-full font-medium hover:scale-105 transition-transform shadow-xl shadow-brand-green/20">
+        <MagneticButton href="https://wa.me/TUNUMERO?text=Hola%20Martin%2C%20quiero%20agendar%20la%20lectura%20Echar%20Ra%C3%ADces" className="px-10 py-5 bg-brand-green text-brand-bg rounded-full font-medium hover:scale-105 transition-transform shadow-xl shadow-brand-green/20">
           Consultar disponibilidad
-        </a>
+        </MagneticButton>
       </div>
     </motion.div>
     <motion.div
@@ -836,17 +1009,19 @@ const AcompanamientoHero = () => (
       transition={{ duration: 1 }}
     >
       <span className="text-[10px] uppercase tracking-[0.4em] opacity-40 mb-10 block font-bold">Programa inmersivo · 4 semanas</span>
-      <h1 className="text-6xl md:text-8xl font-serif leading-[0.95] mb-12">
-        Programa de<br />
-        <span className="italic text-brand-orange">Acompañamiento</span>
-      </h1>
+      <RevealText>
+        <h1 className="text-6xl md:text-8xl font-serif leading-[0.95] mb-12">
+          Programa de<br />
+          <span className="italic text-brand-orange">Acompañamiento</span>
+        </h1>
+      </RevealText>
       <p className="text-xl md:text-2xl opacity-80 leading-relaxed max-w-lg mb-12 font-light">
         Cuatro sesiones en vivo para desmenuzar tu diseño por completo. No para conocerlo: para empezar a vivir desde él.
       </p>
       <div className="flex flex-wrap gap-6">
-        <a href="https://wa.me/TUNUMERO?text=Hola%20Martin%2C%20quiero%20sumarme%20al%20Programa%20de%20Acompa%C3%B1amiento" className="px-10 py-5 bg-brand-orange text-brand-bg rounded-full font-medium hover:scale-105 transition-transform shadow-xl shadow-brand-orange/20">
+        <MagneticButton href="https://wa.me/TUNUMERO?text=Hola%20Martin%2C%20quiero%20sumarme%20al%20Programa%20de%20Acompa%C3%B1amiento" className="px-10 py-5 bg-brand-orange text-brand-bg rounded-full font-medium hover:scale-105 transition-transform shadow-xl shadow-brand-orange/20">
           Consultar por el programa
-        </a>
+        </MagneticButton>
       </div>
     </motion.div>
     <motion.div
@@ -1121,28 +1296,39 @@ const Acompanamiento = () => (
 
 const ScrollToTop = () => {
   const { pathname } = useLocation();
-
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [pathname]);
-
+  useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
   return null;
+};
+
+const AppContent = () => {
+  const location = useLocation();
+  return (
+    <div className="min-h-screen selection:bg-brand-orange selection:text-brand-bg">
+      <Navbar />
+      <AnimatePresence mode="wait">
+        <motion.div key={location.pathname} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.4 }}>
+          <Routes location={location}>
+            <Route path="/" element={<Home />} />
+            <Route path="/reporte" element={<Reporte />} />
+            <Route path="/raices" element={<Raices />} />
+            <Route path="/acompanamiento" element={<Acompanamiento />} />
+          </Routes>
+        </motion.div>
+      </AnimatePresence>
+      <Footer />
+    </div>
+  );
 };
 
 export default function App() {
   return (
-    <Router>
-      <ScrollToTop />
-      <div className="min-h-screen selection:bg-brand-orange selection:text-brand-bg">
-        <Navbar />
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/reporte" element={<Reporte />} />
-          <Route path="/raices" element={<Raices />} />
-          <Route path="/acompanamiento" element={<Acompanamiento />} />
-        </Routes>
-        <Footer />
-      </div>
-    </Router>
+    <>
+      <SmoothScroll />
+      <CustomCursor />
+      <Router>
+        <ScrollToTop />
+        <AppContent />
+      </Router>
+    </>
   );
 }
